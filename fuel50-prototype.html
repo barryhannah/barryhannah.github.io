@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Fuel50: finding your way (prototype)</title>
+<style>
+:root{--bg:#F6F7F9;--sf:#fff;--ink:#1B1F24;--mut:#4F5964;--ln:#7A848E;--lt:#D5DBE1;--ac:#AA079B;--ai:#fff;--ab:#F9E8F7;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161A;--sf:#1B2127;--ink:#EDF0F2;--mut:#A9B3BC;--ln:#7F8A95;--lt:#36404A;--ac:#E070D5;--ai:#0B1A1A;--ab:#3A1F38}}
+:root[data-theme="dark"]{--bg:#12161A;--sf:#1B2127;--ink:#EDF0F2;--mut:#A9B3BC;--ln:#7F8A95;--lt:#36404A;--ac:#E070D5;--ai:#0B1A1A;--ab:#3A1F38}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--sf);z-index:10}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.sr{position:absolute;left:-9999px}
+.bt{background:var(--ac);color:var(--ai);border:0;border-radius:8px;padding:10px 18px;min-height:44px;font-weight:600}
+.bg{background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:8px 14px;min-height:44px}
+.bg[aria-pressed=true]{background:var(--ac);color:var(--ai)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.cd{background:var(--sf);border:1px solid var(--lt);border-radius:12px;padding:18px;display:block}
+button.cd{width:100%;text-align:left}
+.pr{border:2px solid var(--ac)}.mut{color:var(--mut)}
+.chip{display:inline-block;border:1px solid var(--ln);border-radius:999px;padding:1px 10px;font-size:13px}
+.wrap{max-width:1024px;margin:0 auto;padding:0 16px 40px}
+.ctl{background:var(--sf);border-bottom:1px solid var(--lt);font-size:14px}
+.ctl .in,.hi{max-width:1024px;margin:0 auto;padding:8px 16px;display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;background:var(--sf);border-bottom:1px solid var(--lt)}
+.logo{background:none;border:0;font-weight:800;font-size:18px;color:#ED1B2F;min-height:44px;padding:0 8px}
+nav ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:2px}
+nav li button{background:none;border:0;padding:8px 10px;min-height:44px;border-radius:8px}
+nav li button[aria-current=page]{font-weight:700;color:var(--ac);text-decoration:underline}
+.srch{position:relative;margin-left:auto}
+.srch input{width:210px;max-width:100%;padding:9px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg)}
+#res{position:absolute;right:0;top:100%;width:min(340px,86vw);background:var(--sf);border:1px solid var(--ln);border-radius:8px;margin-top:4px;padding:4px;z-index:12}
+#res button{display:block;width:100%;text-align:left;background:none;border:0;padding:10px;min-height:44px;border-radius:6px}
+#res button:hover{background:var(--ab)}
+.bc{font-size:14px;padding:12px 0}.bc ol{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.bc li{display:flex;align-items:center;min-height:32px}
+.bc li+li::before{content:"›";margin-right:4px;color:var(--mut);font-weight:400;text-decoration:none}
+.bc [aria-current=page]{padding:4px;font-weight:700}
+.bc button{background:none;border:0;padding:4px;color:var(--ac);text-decoration:underline;min-height:32px}
+h1{font-size:26px;margin:8px 0 12px}h2{font-size:18px;margin:0 0 6px}
+.ban{background:var(--ac);color:var(--ai);border-radius:12px;padding:22px 20px;margin:20px 0 16px}.ban h1{margin:0 0 4px}.ban p{margin:0}
+.ib{position:relative;width:44px;height:44px;border:0;background:none;border-radius:8px;display:grid;place-items:center}
+.ib svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dot{position:absolute;top:7px;right:8px;width:11px;height:11px;border-radius:50%;background:#D92D20;border:2px solid var(--sf)}
+.nb{position:relative}
+.pop{position:absolute;right:0;top:100%;width:min(320px,86vw);background:var(--sf);border:1px solid var(--ln);border-radius:8px;margin-top:4px;padding:6px;z-index:12}
+.np{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 10px;min-height:44px;border-radius:8px}.np:hover{background:var(--ab)}
+.ok{background:var(--ac);color:var(--ai);border-color:var(--ac);font-weight:600}
+.dn{background:var(--ab)}
+.av{width:44px;height:44px;border-radius:50%;border:1px solid var(--ln);background:var(--ab);font-weight:700}
+.hi .bg{display:flex;align-items:center;gap:8px}
+.mn{position:absolute;left:0;right:0;top:100%;background:var(--sf);border-bottom:1px solid var(--ln);max-height:75vh;overflow:auto}
+.mn .in{max-width:1024px;margin:0 auto;padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 24px}
+.mn h2{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:8px 0 4px}
+.mn ul{list-style:none;margin:0;padding:0}
+.mn li button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 10px;min-height:44px;border-radius:8px}
+.mn li button:hover{background:var(--ab)}.mn li button span{display:block;font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.rows{list-style:none;padding:0;margin:16px 0;display:grid;gap:8px}
+.row{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:var(--sf);border:1px solid var(--lt);border-radius:8px;padding:10px 14px;min-height:44px}
+.sk .sb{display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .3s ease,visibility 0s linear .3s}
+.sk.open .sb{grid-template-rows:1fr;visibility:visible;transition:grid-template-rows .3s ease,visibility 0s}
+.sbi{overflow:hidden;min-height:0}
+.sbp{padding:6px 14px 4px;border:1px solid var(--ac);border-top:0;border-radius:0 0 8px 8px;background:var(--sf)}
+.sk.open .row{border-color:var(--ac);border-radius:8px 8px 0 0}
+.cv{display:inline-block;transition:transform .3s}.sk.open .cv{transform:rotate(90deg)}
+@media (prefers-reduced-motion:reduce){.sk .sb,.cv{transition:none}}
+.asl{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:24px;align-items:start;margin-top:14px}
+.asm{min-width:0}
+.asd{position:sticky;top:78px;max-height:calc(100vh - 98px);overflow:auto;padding:14px}
+.asd h2{margin:0 0 6px}.pg{margin:0 0 6px}
+.sl{list-style:none;margin:12px 0;padding:0;display:grid;gap:2px}
+.sli{display:flex;gap:8px;align-items:center;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:6px 8px;min-height:36px;font-size:14px}
+.sli:hover{background:var(--ab)}.sli.cur{background:var(--ab);font-weight:600;box-shadow:inset 3px 0 0 var(--ac)}
+.ck{width:18px;height:18px;border:1.5px solid var(--ln);border-radius:50%;display:inline-grid;place-items:center;font-size:11px;flex:none}
+.ck:not(:empty){background:var(--ac);border-color:var(--ac);color:var(--ai)}
+@media (max-width:800px){.asl{display:block;padding-bottom:100px}.asd{position:fixed;left:0;right:0;bottom:0;top:auto;max-height:none;border-radius:0;border-width:1px 0 0;z-index:9;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:1fr auto;gap:4px 12px;align-items:center}.asd h2,.asd .sl,.asd>p.mut{display:none}.asd .pg,.asd progress{grid-column:1;margin:0}.asd .bt{grid-row:1/3;grid-column:2}}
+fieldset{border:0;padding:0;margin:14px 0}legend{font-weight:600;margin-bottom:6px;padding:0}
+.lv{display:block;border:1px solid var(--ln);border-radius:8px;padding:10px 12px;margin-bottom:6px;cursor:pointer}
+.lv:has(input:checked){border-color:var(--ac);background:var(--ab);outline:2px solid var(--ac)}
+.lv b{margin-left:6px}
+.tg{font-style:normal;margin-left:8px;font-size:12px;border:1px solid var(--ln);border-radius:999px;padding:1px 8px;background:var(--ab)}
+.lv.is-cur{border-style:dashed}.lv.is-cur:has(input:checked){border-style:solid}.lv span{display:block;margin-left:26px;font-size:14px}
+.pf{display:flex;flex-wrap:wrap;gap:8px}.pf .lv{margin:0;flex:1 1 160px}
+progress{width:100%}
+.asd h2{font-size:20px;margin:0 0 8px}
+.pg{margin:0 0 8px;font-size:16px;line-height:1.2}.pg b{font-size:30px;font-weight:500}
+.tl{margin:10px 0 0}
+input{accent-color:var(--ac)}progress{accent-color:#3477F5}
+progress{appearance:none;-webkit-appearance:none;height:10px;border:0;border-radius:999px;background:var(--lt);overflow:hidden}
+progress::-webkit-progress-bar{background:var(--lt);border-radius:999px}
+progress::-webkit-progress-value{background:#3477F5;border-radius:999px;transition:width .3s}
+progress::-moz-progress-bar{background:#3477F5;border-radius:999px}
+
+.teams{max-width:560px;margin:24px auto;border:1px solid var(--ln);border-radius:12px;overflow:hidden;background:var(--sf)}
+.th{background:#4B4F9E;color:#fff;padding:10px 16px;font-size:14px}.msg{padding:6px 18px 18px}
+#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:20}
+details.wrap{font-size:14px}
+.wrap p{max-width:70ch}
+</style>
+</head>
+<body>
+<div class="ctl"><div class="in"><b>Prototype controls</b>
+<span role="group" aria-label="Who is using it"><button class="bg" data-a="mode" data-m="new">First visit</button> <button class="bg" data-a="mode" data-m="ret">Six months later</button></span>
+<label>Wording <select data-a="vocab"><option value="plain">Plain labels</option><option value="fuel">Current product names</option><option value="client">Client rename</option></select></label>
+<label>Menu <select data-a="mm"><option value="group">Grouped by outcome</option><option value="flat">One flat list (current)</option></select></label>
+<label><input type="checkbox" data-a="mentors" checked> Mentors on</label>
+<button class="bg" data-a="restart">Restart at Teams</button></div></div>
+<header id="hd"></header>
+<main class="wrap" id="app"></main>
+<details class="wrap"><summary>Design notes</summary>
+<p><b>Overall concept:</b> onboarding through a direct prompt to complete a single action. The user is notified that they have a task, and the call to action links them straight to it. Within the product, several other signifiers also promote the required task, such as banners and notifications.</p>
+<p><b>Assumption:</b> the skills self-evaluation is a crucial first step, and the most important of the four profile setup tasks.</p>
+<p><b>Trade-off:</b> the suggested next step is to find an upskilling opportunity through gigs. This could equally point towards a second profile information task, creating a career journey, and so on.</p>
+<p><b>Measure:</b> completion of the task by its deadline, and the accuracy of the personal rating compared with the peer and leader ratings.</p>
+<p><b>Measure:</b> a qualitative review of whether level description transparency improves rating accuracy, whether seeing the whole task increases completion, and how clear completion success makes users feel about the task.</p>
+</details>
+<div id="toast" role="status" hidden></div>
+<script>
+const $=s=>document.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const SK=['Supply Chain Trends','Demand Forecasting','Inventory Management','Procurement','Logistics Planning','Supplier Negotiation','Risk Management','Data Analysis','Process Improvement','Stakeholder Management','Project Management','Budgeting','Contract Management','Sustainability Practices','ERP Systems','Reporting','Team Leadership','Communication'];
+const LV=['Not relevant to me','Basic','Skilled','Advanced','Expert'];
+const PF={enjoy:'I enjoy this',neutral:'Neutral',less:'I’d like to do less of it'};
+const P={home:'Home',profile:'Profile',ph:'Build your profile',skills:'Your skills',values:'What drives you',fit:'How you like to work',agility:'How you approach your career',journeys:'Career journeys',goals:'Goals',feedback:'Feedback',gigs:'Gigs',mentors:'Mentors',learning:'Learning+',vacancies:'Vacancies',resources:'Resources'};
+const V={plain:P,fuel:{...P,profile:'Personalize',ph:'Personalize',skills:'FuelTalents',values:'FuelValues',fit:'FuelFit',agility:'FuelAgility',journeys:'Journeys',learning:'Learn+'},client:{...P,profile:'My Space',ph:'My Space',skills:'Capabilities',gigs:'Stretch Projects',mentors:'Coaches',journeys:'Growth Paths',learning:'Learning Hub'}};
+const OL={skills:'See where you are and where you could grow',values:'Find work that motivates you',fit:'Find roles that suit your style',agility:'Understand your pace and stage'};
+const MN={skills:'10 min',values:'7 min',fit:'10 min',agility:'5 min'};
+const DS=[['home',['start','dashboard']],['profile',['personalize','profile','onboarding']],['skills',['talents','fueltalents','capabilities','competencies','top skills','skill assessment']],['values',['fuelvalues','career engagers']],['fit',['fuelfit','work style']],['agility',['fuelagility','career pace','career stage']],['gigs',['stretch projects','projects','assignments']],['mentors',['coaches','mentoring']],['journeys',['target roles','paths','growth paths']],['learning',['courses','training','learn+']],['goals',['career paths','objectives']],['feedback',['reviews','360']],['vacancies',['jobs','open roles']],['resources',['help','guides']]];
+const SE={gigs:['Supplier cost review · 4 weeks','Forecasting pilot · 6 weeks','Cross-team demand planning · 3 weeks'],mentors:['Priya Nair · supply chain strategy','Tom Hale · procurement'],journeys:['Supply Chain Lead · 5 steps','Procurement Manager · 4 steps'],learning:['Forecasting fundamentals · 2 h','Negotiation essentials · 1 h'],goals:['Move into a supply chain lead role · 2027','Build forecasting depth · this year'],feedback:['Feedback request from Priya · open','Peer review of your skills · in progress'],vacancies:['Supply Chain Planner · Wellington','Procurement Analyst · Auckland'],resources:['Getting started with your profile','How skills ratings work']};
+const T=['values','fit','agility'];
+const MG=[['Know where you stand',['profile','feedback']],['Decide where to go',['journeys','goals']],['Build what you need',['gigs','mentors','learning']],['Take the next step',['vacancies']],['Help',['resources']]];
+const MD={profile:'Your skills and capabilities',feedback:'See and request feedback on your skills',journeys:'Where do you want your career to go?',goals:'Set and track your career goals',gigs:'Advance your skill base',mentors:'Find relevant coaching',learning:'Skill development and training',vacancies:'Find roles that match your career path',resources:'Guides and help'};
+let S,tt;
+const L=k=>V[S.vocab][k];
+const D=(j,n)=>{n=n.toLowerCase();return['This skill isn’t part of my work.',`Understands the basics of ${n} and needs guidance on most tasks.`,`Handles routine ${n} work independently.`,`Handles complex ${n} work and guides others.`,`Recognised authority on ${n}; shapes how the organisation does it.`][j]};
+function reset(mode){const o=S||{};S={mode,view:'teams',mm:o.mm||'group',menu:false,nt:false,vocab:o.vocab||'plain',mentors:o.mentors!==false,names:SK.slice(),lvl:{},pref:{},adv:{},rv:{},cur:{},focus:0,list:[],refresh:false,rdone:false,tool:'values',sec:'gigs',done:{skills:0,values:0,fit:0,agility:0}};if(mode==='ret'){fill();S.done={skills:1,values:1,fit:0,agility:1}}}
+function fill(){S.names.forEach((_,i)=>{S.lvl[i]=[2,2,3,2,2,1,2,3,2,3,3,2,1,1,2,3,3,4][i]??2;S.pref[i]=['enjoy','neutral','less'][i%3];S.adv[i]=[0,7,12].includes(i)?1:0})}
+function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2600)}
+function go(v){S.view=v;S.menu=false;S.nt=false;render(true);window.scrollTo(0,0)}
+function startA(rf,i){S.refresh=rf;S.rv={};S.cur=rf?{...S.lvl}:{};S.list=rf?[0,7]:S.names.map((_,x)=>x);if(rf){S.old={pref:{...S.pref},adv:{...S.adv}};S.list.forEach(x=>{delete S.pref[x];S.adv[x]=0})}S.focus=i??S.list[0];go('assess')}
+function open(k){S.menu=false;S.nt=false;if(T.includes(k)){S.tool=k;go('tool')}else if(k==='skills')startA(S.mode==='ret'&&!S.rdone);else if(k==='home'||k==='profile')go(k);else{S.sec=k;go('sec')}}
+function sc(){const e=document.getElementById('sk'+S.focus);e&&e.scrollIntoView({block:'center'})}
+function nx(){const g=S.names.filter((_,i)=>S.adv[i]&&S.lvl[i]>0),left=Object.values(S.done).filter(x=>!x).length;
+const gg={t:`Find ${L('gigs').toLowerCase()} that grow ${g[0]||'your skills'}`,s:'Matched to the skills you want to build',k:'gigs'},jj={t:'Map a career journey',s:'See which roles your skills point towards',k:'journeys'},pp={t:S.vocab==='plain'?'Finish your profile':`Finish ${L('profile')}`,s:`${left} left, about ${left*8} minutes`,k:'profile'};
+return(g.length?[gg,jj]:[jj,gg]).concat(left?[pp]:[])}
+function tiles(){const st=k=>S.done[k]?(k==='skills'&&S.mode==='ret'&&!S.rdone?'due':'done'):'todo';
+return`<div class="grid">${['skills','values','fit','agility'].sort((a,b)=>(st(a)==='done')-(st(b)==='done')).map(k=>{const s=st(k),pri=k==='skills'&&s!=='done';return`<button class="cd ${pri?'pr':''} ${s==='done'?'dn':''}" data-a="open" data-k="${k}"><b>${L(k)}</b> ${pri&&s==='todo'?'<span class="chip">Start here</span>':''}<br><span class="mut">${OL[k]}</span><br>${s==='done'?'<span class="chip ok"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 12 12"><path d="M2 6.5l3 3 5-6" fill="none" stroke="currentColor" stroke-width="2"/></svg> Done</span> <span class="mut">Review</span>':`<span class="chip">${s==='due'?'Refresh due':'Not started'}</span> <span class="mut">${MN[k]}</span>`}</button>`}).join('')}</div>`}
+const step=(o,p)=>`<button class="cd ${p?'pr':''}" data-a="open" data-k="${o.k}"><b>${p?'Recommended: ':''}${o.t}</b><br><span class="mut">${o.s}</span></button>`;
+function row(i){const n=esc(S.names[i]),v=S.lvl[i],o=i===S.focus,sel=S.refresh?(S.rv[i]?v:undefined):v;
+return`<li class="sk ${o?'open':''}" id="sk${i}"><button class="row" data-a="focus" data-i="${i}" aria-expanded="${o}" aria-controls="sb${i}"><span>${n}</span><span><span class="chip">${S.refresh?(S.rv[i]?(S.cur[i]===v?LV[v]+' · no change':LV[S.cur[i]]+' → '+LV[v]):'Current: '+LV[v]):(v===undefined?'Not rated':LV[v]+(S.adv[i]?' · building':''))}</span> <span class="cv" aria-hidden="true">›</span></span></button><div class="sb" id="sb${i}"><div class="sbi"><div class="sbp"><fieldset><legend>${S.refresh?'Which level are you at now?':'How would you rate your level?'}</legend>${S.refresh?'<p class="mut" style="margin:0 0 8px;font-size:14px">Your current level is marked. Choose the same one if nothing has changed.</p>':''}${LV.map((x,j)=>`<label class="lv ${S.refresh&&S.cur[i]===j?'is-cur':''}"><input type="radio" name="l${i}" id="lv${i}_${j}" value="${j}" data-a="lvl" ${sel===j?'checked':''}><b>${x}</b>${S.refresh&&S.cur[i]===j?'<i class="tg">Your current level</i>':''}<span class="mut">${D(j,S.names[i])}</span></label>`).join('')}</fieldset>${sel>0?`<fieldset><legend>How do you feel about this work?</legend><div class="pf">${Object.entries(PF).map(([k,t])=>`<label class="lv"><input type="radio" name="p${i}" id="pf${i}_${k}" value="${k}" data-a="pref" ${S.pref[i]===k?'checked':''}><b>${t}</b></label>`).join('')}</div></fieldset><label><input type="checkbox" id="adv${i}" data-a="adv" ${S.adv[i]?'checked':''}> I’d like to build this skill further</label>`:''}${i===S.list[S.list.length-1]?'':'<p><button class="bt" data-a="next">Next skill</button></p>'}</div></div></div></li>`}
+function setFocus(i,force){if(i===S.focus&&!force)i=-1;const o=document.getElementById('sk'+S.focus),n=document.getElementById('sk'+i);S.focus=i;document.querySelectorAll('.sli').forEach(b=>b.classList.toggle('cur',+b.dataset.i===i));[[o,0],[n,1]].forEach(([li,on])=>{if(!li)return;li.classList.toggle('open',!!on);li.querySelector('.row').setAttribute('aria-expanded',!!on)});if(n)setTimeout(sc,320)}
+function side(l,ans){const left=Math.max(1,Math.ceil((l.length-ans)*.5));
+return`<aside class="asd cd" aria-label="Rating progress"><h2>Progress</h2><p class="pg"><b>${ans} of ${l.length}</b> <span class="mut">rated</span></p><progress max="${l.length}" value="${ans}" aria-label="Skills rated"></progress><p class="mut tl">${ans<l.length?`About ${left} min left`:'All rated. Ready to finish.'}</p></aside>`}
+function chg(){return`<div class="cd" style="margin-bottom:12px"><h2>What changed</h2><ul style="margin:0;padding-left:20px">${S.list.map(i=>{const a=S.cur[i],b=S.lvl[i];return`<li>${esc(S.names[i])}: ${a===b?LV[b]+' · no change':'<b>'+LV[a]+' → '+LV[b]+'</b>'}</li>`}).join('')}</ul></div>`}
+const VW={
+teams(){const r=S.mode==='ret';return`<div class="teams"><div class="th">Microsoft Teams (mock)</div><div class="msg"><h1 class="sr" tabindex="-1">Message in Teams</h1><p class="mut" style="font-size:14px">${r?'Fuel50 · app notification':'Alex Rivera · your manager'} · 9:02 AM</p>${r?'<p>Hi Sam, since March you finished one gig and flagged two skills you want to build. Two skills are due for a quarterly refresh. It takes about 3 minutes.</p>':'<p>Hi Sam, could you rate your skills in Fuel50 by Fri 13 Nov? It takes about 10 minutes and gives us a shared starting point for development conversations. It’s a baseline, not a performance score.</p><p>There are a few other profile items too. Please use work time for them over the coming weeks.</p>'}<div style="display:flex;flex-wrap:wrap;gap:8px"><button class="bt" data-a="open" data-k="skills">${r?'Refresh 2 skills':'Rate your skills (10 min)'}</button>${r?'<button class="bg" data-a="open" data-k="home">Open Fuel50</button>':'<button class="bg" data-a="toast" data-m="Reminder set for tomorrow (mock)">Remind me tomorrow</button>'}</div></div></div>`},
+home(){const r=S.mode==='ret',d=S.done,rec=nx()[0];let c;
+if(!d.skills)c=`<div class="cd pr"><p class="mut" style="margin:0">Next step · requested by Alex Rivera · due Fri 13 Nov</p><h2>Rate your skills</h2><p>About 10 minutes. ${OL.skills}.</p><button class="bt" data-a="open" data-k="skills">Rate your skills</button></div>`;
+else if(r&&!S.rdone)c=`<div class="cd pr"><p class="mut" style="margin:0">Where you left off · last visit 12 Mar</p><h2>Refresh 2 skills</h2><p>Since then you finished a gig and saved 2 target roles. Two skills are due for a check, about 3 minutes.</p><button class="bt" data-a="open" data-k="skills">Refresh 2 skills</button></div>`;
+else c=`<div class="cd pr"><p class="mut" style="margin:0">Suggested next step</p><h2>${rec.t}</h2><p>${rec.s}</p><button class="bt" data-a="open" data-k="${rec.k}">Go</button></div>`;
+const g=S.names.filter((_,i)=>S.adv[i])[0],pk=d.skills?`<div class="grid">${[['gigs',SE.gigs[0]+(g?' · grows '+esc(g):'')],['journeys',SE.journeys[0]],['vacancies',SE.vacancies[0]]].map(([k,t])=>`<button class="cd" data-a="open" data-k="${k}"><b>${L(k)}</b><br><span class="mut">${t}</span></button>`).join('')}</div>`:`<div class="cd" style="border-style:dashed"><b>Nothing picked yet</b><p class="mut" style="margin:4px 0 0">Your picks are matched from your skills. Rate them and suggestions appear here.</p></div>`;
+return`<div class="ban"><h1 tabindex="-1">${r?'Welcome back, Sam':'Welcome, Sam'}</h1><p>${d.skills?'Opportunities picked for you.':'A few quick things to get you started.'}</p></div>${c}<h2 style="margin-top:28px">${L('ph')}</h2><p class="mut" style="margin:0 0 12px">Add to it at your own pace, in any order. Each part improves what Fuel50 suggests.</p>${tiles()}<h2 style="margin-top:28px">Opportunities picked for you</h2>${pk}`},
+profile(){return`<h1 tabindex="-1">${L('profile')}</h1><p>Building your profile helps Fuel50 suggest opportunities that fit you. Skills come first. The rest can be done in any order.</p>${tiles()}`},
+assess(){const l=S.list,ans=l.filter(i=>S.refresh?S.rv[i]:S.lvl[i]!==undefined).length,rf=S.refresh;
+return`<h1 tabindex="-1">${rf?'Refresh your skills':'Rate your skills'}</h1><div class="cd"><p style="margin:0">${rf?'Quarterly check-in: 2 skills to review. Your current level is marked on each one. Choose the level you’re at now, which may be higher.':'Requested by Alex Rivera, due Fri 13 Nov. This is an honest starting point, not a performance score. Your peers and Alex add their view later.'}</p></div><div class="asl"><div class="asm"><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="bg" data-a="later">Save and finish later</button>${rf?'':'<button class="bg" data-a="fill">Fill with sample answers (demo)</button>'}</div><ol class="rows">${l.map(row).join('')}</ol>${rf?'':'<p><label>Missing a skill? <input id="nw" style="padding:8px;border:1px solid var(--ln);border-radius:8px;background:var(--sf)"></label> <button class="bg" data-a="add">Add</button></p>'}<button class="bt" data-a="finish" ${ans<l.length?'disabled':''}>Finish</button>${ans<l.length?'<span class="mut"> Rate every skill to finish.</span>':''}</div>${side(l,ans)}</div>`},
+complete(){const n=S.names,ix=n.map((_,i)=>i).filter(i=>S.lvl[i]>0),st=ix.filter(i=>S.lvl[i]>=3),gr=ix.filter(i=>S.adv[i]),[rec,...alt]=nx(),ls=(a,f)=>a.length?`<ul>${a.slice(0,4).map(f).join('')}</ul>`:'<p class="mut">None marked yet.</p>';
+return`<h1 tabindex="-1">${S.refresh?'Skills updated. Nice work.':'Baseline saved. Nice work.'}</h1><p class="mut">${S.refresh?'Your updates are saved.':'Preliminary until your peers and Alex add their view.'}</p>${S.refresh?chg():''}<div class="grid"><div class="cd"><h2>Where you’re strong</h2>${ls(st,i=>`<li>${esc(n[i])} · ${LV[S.lvl[i]]}</li>`)}</div><div class="cd"><h2>What you want to build</h2>${ls(gr,i=>`<li>${esc(n[i])}</li>`)}</div></div><h2 style="margin-top:24px">What would you like to do next?</h2>${step(rec,1)}<div class="grid" style="margin-top:12px">${alt.map(o=>step(o,0)).join('')}</div><p><button class="bg" data-a="open" data-k="home">Go to Home</button></p>`},
+tool(){const k=S.tool;return`<h1 tabindex="-1">${L(k)}</h1><p>${OL[k]}. About ${MN[k]}.</p><div class="cd"><p class="mut" style="margin-top:0">Stand-in for the real exercise in this prototype.</p><button class="bt" data-a="tdone">Mark as completed</button></div>`},
+sec(){const k=S.sec,g=S.names.filter((_,i)=>S.adv[i])[0];return`<h1 tabindex="-1">${L(k)}</h1><p class="mut">${k==='gigs'&&g?`Matched to ${esc(g)}, a skill you want to build.`:'Sample content for the prototype.'}</p><ul class="rows">${SE[k].map(t=>`<li class="cd">${t}</li>`).join('')}</ul>`}};
+function ntf(){return S.mode==='ret'?(S.rdone?[]:[{t:'Quarterly refresh: 2 skills are due',s:'About 3 minutes'}]):(S.done.skills?[]:[{t:'Alex Rivera asked you to rate your skills',s:'Due Fri 13 Nov · about 10 minutes'}])}
+function nb(){const n=ntf();return`<div class="nb"><button class="ib" data-a="nt" aria-expanded="${S.nt}" aria-label="Notifications${n.length?', '+n.length+' new':''}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 17h12l-1.5-2v-5a4.5 4.5 0 0 0-9 0v5L6 17zM10 20h4"/></svg>${n.length?'<span class="dot" aria-hidden="true"></span>':''}</button><div class="pop" ${S.nt?'':'hidden'}><p style="margin:4px 8px;font-weight:600">Notifications</p>${n.length?n.map(o=>`<button class="np" data-a="open" data-k="skills"><b>${o.t}</b><br><span class="mut">${o.s}</span></button>`).join(''):'<p class="mut" style="margin:8px">You’re all caught up.</p>'}</div></div>`}
+function menu(){const vis=k=>k!=='mentors'||S.mentors;
+if(S.mm==='flat')return`<div class="in" style="display:block"><ul>${['home','profile','journeys','goals','feedback','gigs','mentors','learning','vacancies','resources'].filter(vis).map(k=>`<li><button data-a="open" data-k="${k}">${L(k)}</button></li>`).join('')}</ul></div>`;
+return`<div class="in"><ul style="grid-column:1/-1;border-bottom:1px solid var(--lt);padding-bottom:4px"><li><button data-a="open" data-k="home"><b>${L('home')}</b><span class="mut">Your tasks and picks for you</span></button></li></ul>${MG.map(([t,ks])=>{ks=ks.filter(vis);return ks.length?`<section><h2>${t}</h2><ul>${ks.map(k=>`<li><button data-a="open" data-k="${k}"><b>${L(k)}</b><span class="mut">${MD[k]}</span></button></li>`).join('')}</ul></section>`:''}).join('')}</div>`}
+function hdr(){
+return`<div class="hi"><button class="logo" data-a="open" data-k="home" aria-label="Fuel50 home">Fuel50</button><button class="bg" data-a="menu" aria-expanded="${S.menu}" aria-controls="mn"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M3 3h.01M8 3h.01M13 3h.01M3 8h.01M8 8h.01M13 8h.01M3 13h.01M8 13h.01M13 13h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>Menu</button><div class="srch" role="search"><label class="sr" for="q">Search</label><input id="q" type="search" placeholder="Search anything" autocomplete="off"><div id="res" hidden></div></div>${nb()}<button class="ib" data-a="toast" data-m="Language switching isn’t part of this prototype" aria-label="Language: English"><svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></button><button class="av" data-a="open" data-k="profile" aria-label="Sam, your profile">S</button></div><div id="mn" class="mn" ${S.menu?'':'hidden'}>${menu()}</div>`}
+function bc(){const v=S.view;if(v==='home'||v==='teams')return'';const tr={profile:['profile'],assess:['profile','skills'],complete:['profile','skills','Summary'],tool:['profile',S.tool],sec:[S.sec]}[v],it=['home',...tr];
+return`<nav class="bc" aria-label="Breadcrumb"><ol>${it.map((k,i)=>{const t=P[k]?L(k):k;return i===it.length-1?`<li aria-current="page">${t}</li>`:`<li><button data-a="open" data-k="${k}">${t}</button></li>`}).join('')}</ol></nav>`}
+function render(f){$('#hd').innerHTML=S.view==='teams'?'':hdr();$('#app').innerHTML=bc()+VW[S.view]();if(f===true){const h=$('#app h1');h&&h.focus()}else if(f){const e=document.getElementById(f);e&&e.focus()}
+document.querySelectorAll('[data-a=mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===S.mode));$('[data-a=vocab]').value=S.vocab;$('[data-a=mm]').value=S.mm;$('[data-a=mentors]').checked=S.mentors}
+function srch(q){q=q.trim().toLowerCase();const r=$('#res');if(!q){r.hidden=true;return}const o=[];
+DS.forEach(([k,al])=>{if(k==='mentors'&&!S.mentors)return;const lab=L(k),h=[lab,P[k],...al].find(t=>t.toLowerCase().includes(q));if(h)o.push(`<button data-a="open" data-k="${k}">${lab}${h!==lab?` <span class="mut">· also called “${h}”</span>`:''}</button>`)});
+S.names.forEach((n,i)=>{if(n.toLowerCase().includes(q))o.push(`<button data-a="sk" data-i="${i}">${esc(n)} <span class="mut">· a skill in ${L('skills')}</span></button>`)});
+r.hidden=false;r.innerHTML=o.slice(0,6).join('')||'<p class="mut" style="padding:8px;margin:0">No matches. Try “skills” or “gigs”.</p>'}
+document.addEventListener('input',e=>{if(e.target.id==='q')srch(e.target.value)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(S.menu||S.nt)){const s=S.nt?'[data-a=nt]':'[data-a=menu]';S.menu=false;S.nt=false;render();const m=$(s);m&&m.focus()}});
+document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a,i=S.focus;
+if(a==='lvl'){S.lvl[i]=+t.value;S.rv[i]=1;if(!+t.value){delete S.pref[i];S.adv[i]=0}render('lv'+i+'_'+t.value)}
+else if(a==='pref'){S.pref[i]=t.value;render('pf'+i+'_'+t.value)}
+else if(a==='adv'){S.adv[i]=t.checked?1:0;render('adv'+i)}
+else if(a==='vocab'){S.vocab=t.value;render()}
+else if(a==='mm'){S.mm=t.value;S.menu=S.view!=='teams';render()}
+else if(a==='mentors'){S.mentors=t.checked;if(!S.mentors&&S.view==='sec'&&S.sec==='mentors')S.view='home';render()}});
+document.addEventListener('click',e=>{const t=e.target;if((S.menu&&!t.closest('header'))||(S.nt&&!t.closest('.nb'))){S.menu=false;S.nt=false;render()}if(!t.closest('.srch')){const r=$('#res');r&&(r.hidden=true)}
+const b=t.closest('[data-a]');if(!b||b.tagName==='INPUT'||b.tagName==='SELECT')return;const a=b.dataset.a,k=b.dataset.k,i=+b.dataset.i;
+if(a==='open')open(k);
+else if(a==='sk')startA(false,i);
+else if(a==='nt'){S.nt=!S.nt;S.menu=false;render();if(S.nt){const f=$('.pop button');f&&f.focus()}}
+else if(a==='menu'){S.menu=!S.menu;S.nt=false;render();if(S.menu){const f=$('#mn button');f&&f.focus()}}
+else if(a==='mode'){reset(b.dataset.m);render(true)}
+else if(a==='restart'){reset(S.mode);render(true)}
+else if(a==='focus'){setFocus(i)}
+else if(a==='jump'){setFocus(i,true)}
+else if(a==='next'){const p=S.list.indexOf(S.focus),q=Math.min(p+1,S.list.length-1);setFocus(S.list[q],true);if(p>=S.list.length-1){const f=$('[data-a=finish]');f&&f.scrollIntoView({behavior:'smooth',block:'center'})}}
+else if(a==='fill'){fill();S.focus=S.list[S.list.length-1];render();toast('Sample answers added (demo)');const f=$('[data-a=finish]');if(f){f.focus({preventScroll:true});f.scrollIntoView({behavior:'smooth',block:'center'})}}
+else if(a==='later'){if(S.refresh&&S.old)S.list.filter(x=>!S.rv[x]).forEach(x=>{S.pref[x]=S.old.pref[x];S.adv[x]=S.old.adv[x]});toast('Progress saved. Pick it up any time.');go('home')}
+else if(a==='finish'){S.done.skills=1;if(S.refresh)S.rdone=true;go('complete')}
+else if(a==='add'){const v=$('#nw').value.trim();if(v){S.names.push(v);const n=S.names.length-1;S.list.push(n);S.focus=n;render();sc()}}
+else if(a==='tdone'){S.done[S.tool]=1;toast('Saved (mock)');go('profile')}
+else if(a==='toast')toast(b.dataset.m)});
+reset('new');render();
+</script>
+</body>
+</html>
